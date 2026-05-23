@@ -362,11 +362,32 @@ h1 {
   place-items: center;
   flex: 0 0 auto;
   border-radius: 18px;
-  background: var(--icon-bg, linear-gradient(135deg, #2d7ff9, #66d1ff));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
   color: #ffffff;
   font-size: 21px;
   font-weight: 800;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.48), 0 12px 28px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+.app-icon img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.app-icon-fallback {
+  display: none;
+}
+
+.app-icon.is-fallback {
+  border: 0;
+  background: var(--icon-bg, linear-gradient(135deg, #2d7ff9, #66d1ff));
+}
+
+.app-icon.is-fallback .app-icon-fallback {
+  display: block;
 }
 
 .link-card h3 {
@@ -1480,6 +1501,10 @@ function domainFromUrl(url) {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
+function faviconFromUrl(url) {
+  return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=64`;
+}
+
 function createActions(link) {
   return `
     <div class="card-actions">
@@ -1490,7 +1515,12 @@ function createActions(link) {
 }
 
 function createIcon(link) {
-  return `<span class="app-icon" style="--icon-bg: ${link.color}" aria-hidden="true">${link.initials}</span>`;
+  return `
+    <span class="app-icon" style="--icon-bg: ${link.color}" aria-hidden="true">
+      <img src="${faviconFromUrl(link.url)}" alt="" loading="lazy" onerror="this.parentElement.classList.add('is-fallback'); this.remove();">
+      <span class="app-icon-fallback">${link.initials}</span>
+    </span>
+  `;
 }
 
 function createAiProfile(link) {
