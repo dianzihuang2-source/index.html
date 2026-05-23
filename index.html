@@ -285,6 +285,23 @@ h1 {
   backdrop-filter: saturate(180%) blur(18px);
 }
 
+.hero-photo {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #f5f5f7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
 .stats-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -890,6 +907,9 @@ html.is-mobile .copy-button {
         </div>
 
         <div class="hero-panel" aria-label="网址统计">
+          <figure class="hero-photo">
+            <img src="assets/hero-photo.jpg" alt="烤鸭笔记配图" loading="eager">
+          </figure>
           <div class="stats-row" aria-label="链接统计">
             <div>
               <strong id="total-count">0</strong>
@@ -1463,6 +1483,36 @@ const officialLinks = [
     color: "linear-gradient(135deg, #7c2d12, #f59e0b)",
   },
   {
+    name: "Microsoft 365 / Office",
+    description: "Microsoft 365 官方入口，可访问 Word、Excel、PowerPoint、Outlook 等办公应用。",
+    url: "https://www.office.com/",
+    category: "office",
+    categoryLabel: "办公服务",
+    initials: "365",
+    iconUrl: "https://www.office.com/favicon.ico",
+    color: "linear-gradient(135deg, #f25022, #7fba00 45%, #00a4ef)",
+  },
+  {
+    name: "Excel",
+    description: "Microsoft Excel 官方入口，用于电子表格、数据分析和在线协作。",
+    url: "https://www.microsoft.com/en-us/microsoft-365/excel",
+    category: "office",
+    categoryLabel: "办公服务",
+    initials: "XL",
+    iconUrl: "https://www.microsoft.com/favicon.ico?v2",
+    color: "linear-gradient(135deg, #107c41, #21a366)",
+  },
+  {
+    name: "LibreOffice",
+    description: "LibreOffice 官方下载入口，开源办公套件，包含 Writer、Calc、Impress 等组件。",
+    url: "https://www.libreoffice.org/download/download-libreoffice/",
+    category: "office",
+    categoryLabel: "办公服务",
+    initials: "LO",
+    iconUrl: "https://www.libreoffice.org/favicon.ico",
+    color: "linear-gradient(135deg, #18a303, #0f6b2f)",
+  },
+  {
     name: "WPS",
     description: "金山办公 WPS 官方入口。",
     url: "https://www.wps.cn/",
@@ -1515,9 +1565,10 @@ function createActions(link) {
 }
 
 function createIcon(link) {
+  const iconUrl = link.iconUrl || faviconFromUrl(link.url);
   return `
     <span class="app-icon" style="--icon-bg: ${link.color}" aria-hidden="true">
-      <img src="${faviconFromUrl(link.url)}" alt="" loading="lazy" onerror="this.parentElement.classList.add('is-fallback'); this.remove();">
+      <img src="${iconUrl}" alt="" loading="lazy" onerror="this.parentElement.classList.add('is-fallback'); this.remove();">
       <span class="app-icon-fallback">${link.initials}</span>
     </span>
   `;
