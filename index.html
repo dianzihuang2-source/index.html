@@ -78,6 +78,18 @@ input {
   font: inherit;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -247,6 +259,75 @@ h1 {
 .link-card p {
   min-width: 0;
   max-width: 100%;
+}
+
+.site-search {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.search-control {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 18px;
+  border: 1px solid rgba(0, 113, 227, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.06);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.search-control:focus-within {
+  border-color: rgba(0, 113, 227, 0.48);
+  box-shadow: 0 18px 42px rgba(0, 113, 227, 0.16);
+}
+
+.search-control input {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.search-control input::placeholder {
+  color: #86868b;
+}
+
+.search-control button {
+  min-height: 38px;
+  flex: 0 0 auto;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.search-control button:hover {
+  background: var(--blue-hover);
+  transform: scale(1.03);
+}
+
+.search-control button:active {
+  transform: scale(0.98);
+}
+
+.search-status {
+  min-height: 18px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .promo-banner {
@@ -494,6 +575,29 @@ h1 {
   border-color: rgba(0, 113, 227, 0.34);
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
+}
+
+.link-card.is-highlighted {
+  border-color: rgba(0, 113, 227, 0.62);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14), 0 24px 60px rgba(0, 113, 227, 0.18);
+  animation: card-highlight 1200ms ease 1;
+}
+
+@keyframes card-highlight {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  45% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-card.is-highlighted {
+    animation: none;
+  }
 }
 
 .app-icon {
@@ -856,6 +960,15 @@ code {
     font-size: 17px;
   }
 
+  .search-control {
+    min-height: 50px;
+    padding-left: 14px;
+  }
+
+  .search-control button {
+    padding: 0 14px;
+  }
+
   .promo-banner {
     min-height: 0;
     flex-direction: column;
@@ -1019,6 +1132,13 @@ html.is-mobile .copy-button {
     <main id="top">
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
+          <form class="site-search" role="search" aria-label="搜索网址入口">
+            <div class="search-control">
+              <input id="site-search-input" type="search" aria-label="搜索网站" placeholder="搜索网站名或域名，例如 Suno、Chrome、Kimi" autocomplete="off">
+              <button type="submit">搜索</button>
+            </div>
+            <p class="search-status" id="search-status" aria-live="polite"></p>
+          </form>
           <a class="promo-banner" href="https://pqjc.site/register?code=w4gVAoxE&amp;cover=sfw" target="_blank" rel="noopener noreferrer" aria-label="打开烤鸭自用节点">
             <span>
               <strong>烤鸭自用节点</strong>
@@ -1032,7 +1152,7 @@ html.is-mobile .copy-button {
 
         <div class="hero-panel" aria-label="网址统计">
           <figure class="hero-photo" role="button" tabindex="0" aria-label="打开照片预览">
-            <img src="assets/gallery/hero-photo.jpg" alt="烤鸭笔记配图" loading="eager">
+            <img src="assets/gallery/IMG_5862.JPG" alt="烤鸭笔记配图" loading="eager">
           </figure>
           <div class="stats-row" aria-label="链接统计">
             <div>
@@ -1057,12 +1177,13 @@ html.is-mobile .copy-button {
             <button class="filter-pill is-active" type="button" data-filter="browser" role="tab" aria-selected="true">浏览器</button>
             <button class="filter-pill" type="button" data-filter="remote" role="tab" aria-selected="false">远程控制</button>
             <button class="filter-pill" type="button" data-filter="network" role="tab" aria-selected="false">网络工具</button>
-            <button class="filter-pill" type="button" data-filter="china-ai" role="tab" aria-selected="false">国内 AI</button>
-            <button class="filter-pill" type="button" data-filter="global-ai" role="tab" aria-selected="false">国外 AI</button>
             <button class="filter-pill" type="button" data-filter="dev" role="tab" aria-selected="false">开发工具</button>
             <button class="filter-pill" type="button" data-filter="ai-dependency" role="tab" aria-selected="false">AI 依赖</button>
             <button class="filter-pill" type="button" data-filter="office" role="tab" aria-selected="false">办公服务</button>
             <button class="filter-pill" type="button" data-filter="cloud-drive" role="tab" aria-selected="false">国内网盘</button>
+            <button class="filter-pill" type="button" data-filter="china-ai" role="tab" aria-selected="false">国内 AI</button>
+            <button class="filter-pill" type="button" data-filter="global-ai" role="tab" aria-selected="false">国外 AI</button>
+            <button class="filter-pill" type="button" data-filter="music-ai" role="tab" aria-selected="false">音乐 AI</button>
           </div>
 
           <div class="card-grid" id="card-grid" aria-live="polite"></div>
@@ -1409,13 +1530,101 @@ const officialLinks = [
   {
     name: "Suno",
     description: "AI 音乐生成平台，可根据提示词生成歌曲和伴奏。",
-    strength: "从歌词到完整歌曲的生成体验快，适合 Demo、短视频配乐和灵感草稿。",
+    strength: "从歌词到完整歌曲的生成体验快，适合 Demo、短视频配乐、旋律草稿和灵感记录。",
     weakness: "精细编曲、版权归属和商业授权需要仔细确认，专业后期仍不可少。",
     url: "https://suno.com/",
-    category: "global-ai",
-    categoryLabel: "国外 AI",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
     initials: "Su",
     color: "linear-gradient(135deg, #f97316, #7c2d12)",
+  },
+  {
+    name: "Udio",
+    description: "面向歌曲生成、歌词创作和音频延展的 AI 音乐平台。",
+    strength: "人声表现和风格提示可玩性强，适合生成歌曲片段、完整歌曲和音乐灵感。",
+    weakness: "下载、授权和可用功能会随平台政策变化，商用前必须查看官网条款。",
+    url: "https://www.udio.com/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "Ud",
+    color: "linear-gradient(135deg, #111827, #7c3aed)",
+  },
+  {
+    name: "Stable Audio",
+    description: "Stability AI 推出的生成式音乐和音效平台。",
+    strength: "适合生成配乐、氛围音、音效和音乐素材，偏素材生产和声音设计。",
+    weakness: "完整歌曲和中文歌词场景不一定是强项，额度和授权以官网为准。",
+    url: "https://stableaudio.com/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "SA",
+    color: "linear-gradient(135deg, #0f172a, #8b5cf6)",
+  },
+  {
+    name: "ElevenLabs Music",
+    description: "ElevenLabs 的 AI 音乐生成工具，可用自然语言生成歌曲和纯音乐。",
+    strength: "音频生成体系成熟，适合生成带人声或纯音乐的高质感音乐草稿。",
+    weakness: "音乐版权、禁止模仿对象和商用范围需要严格按 ElevenLabs Music Terms 核验。",
+    url: "https://elevenlabs.io/music",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "11",
+    color: "linear-gradient(135deg, #111827, #64748b)",
+  },
+  {
+    name: "AIVA",
+    description: "AI 音乐生成助手，偏配乐、古典、管弦和影视游戏音乐。",
+    strength: "可生成多种风格的器乐配乐，支持 MIDI/音频工作流，适合背景音乐和编曲草稿。",
+    weakness: "流行歌人声生成不是核心强项，免费和低阶套餐的商用限制较多。",
+    url: "https://www.aiva.ai/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "AI",
+    color: "linear-gradient(135deg, #1e3a8a, #38bdf8)",
+  },
+  {
+    name: "SOUNDRAW",
+    description: "面向创作者的 AI 免版税背景音乐生成平台。",
+    strength: "适合快速生成可编辑的 BGM、视频配乐和社媒内容音乐。",
+    weakness: "更偏背景音乐，复杂歌曲结构、人声和高度个性化编曲能力有限。",
+    url: "https://soundraw.io/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "SR",
+    color: "linear-gradient(135deg, #06b6d4, #22c55e)",
+  },
+  {
+    name: "Mubert",
+    description: "AI 音乐生成平台，可按提示词、场景、情绪和用途生成音乐。",
+    strength: "适合视频、播客、游戏和直播背景音乐，生成速度快，场景化明显。",
+    weakness: "旋律记忆点和完整歌曲表达通常不如专门的歌曲生成工具。",
+    url: "https://mubert.ai/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "Mu",
+    color: "linear-gradient(135deg, #7c3aed, #ec4899)",
+  },
+  {
+    name: "Boomy",
+    description: "面向普通用户的生成式音乐创作平台。",
+    strength: "上手门槛低，适合快速生成歌曲草稿和尝试不同风格。",
+    weakness: "成品精修空间有限，发行、授权和收益相关规则需要逐条查看。",
+    url: "https://boomy.com/",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "Bo",
+    color: "linear-gradient(135deg, #f59e0b, #ef4444)",
+  },
+  {
+    name: "MusicFX",
+    description: "Google Labs 的实验性 AI 音乐生成工具。",
+    strength: "适合尝试 Google 音乐生成能力和快速生成创意音乐片段。",
+    weakness: "地区可用性受限，当前访问可能提示所在国家或地区不可用。",
+    url: "https://labs.google/fx/tools/music-fx",
+    category: "music-ai",
+    categoryLabel: "音乐 AI",
+    initials: "MF",
+    color: "linear-gradient(135deg, #4285f4, #34a853)",
   },
   {
     name: "Cursor",
@@ -1653,6 +1862,7 @@ const categoryNames = {
   network: "网络工具",
   "china-ai": "国内 AI",
   "global-ai": "国外 AI",
+  "music-ai": "音乐 AI",
   dev: "开发工具",
   "ai-dependency": "AI 依赖",
   office: "办公服务",
@@ -1665,10 +1875,14 @@ const categoryCount = document.querySelector("#category-count");
 const filterButtons = document.querySelectorAll(".filter-pill");
 const emptyState = document.querySelector("#empty-state");
 const toast = document.querySelector("#toast");
+const searchForm = document.querySelector(".site-search");
+const searchInput = document.querySelector("#site-search-input");
+const searchStatus = document.querySelector("#search-status");
 const avatarMark = document.querySelector(".brand-mark");
 const heroPhoto = document.querySelector(".hero-photo");
 
 let activeFilter = "browser";
+let activeHighlightName = "";
 let toastTimer;
 let avatarLightbox;
 let photoLightbox;
@@ -1680,6 +1894,59 @@ function domainFromUrl(url) {
 
 function faviconFromUrl(url) {
   return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=64`;
+}
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\s+/g, "");
+}
+
+function searchableText(link) {
+  return [
+    link.name,
+    domainFromUrl(link.url),
+    link.url,
+    link.description,
+    link.strength,
+    link.weakness,
+    link.categoryLabel,
+    link.initials,
+  ].join(" ");
+}
+
+function findBestLink(query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return null;
+
+  return officialLinks
+    .map((link) => {
+      const name = normalizeSearchText(link.name);
+      const domain = normalizeSearchText(domainFromUrl(link.url));
+      const fullText = normalizeSearchText(searchableText(link));
+      let score = 0;
+
+      if (name === normalizedQuery || domain === normalizedQuery) score = 100;
+      else if (name.startsWith(normalizedQuery) || domain.startsWith(normalizedQuery)) score = 80;
+      else if (name.includes(normalizedQuery) || domain.includes(normalizedQuery)) score = 60;
+      else if (fullText.includes(normalizedQuery)) score = 30;
+
+      return { link, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)[0]?.link || null;
+}
+
+function setActiveFilter(category) {
+  activeFilter = category;
+  filterButtons.forEach((item) => {
+    const isActive = item.dataset.filter === category;
+    item.classList.toggle("is-active", isActive);
+    item.setAttribute("aria-selected", String(isActive));
+  });
 }
 
 function createActions(link) {
@@ -1729,7 +1996,7 @@ function renderCards() {
   cardGrid.innerHTML = filtered
     .map(
       (link) => `
-        <article class="link-card">
+        <article class="link-card${link.name === activeHighlightName ? " is-highlighted" : ""}" data-link-key="${encodeURIComponent(link.name)}">
           <div class="card-top">
             ${createIcon(link)}
             <div>
@@ -1750,6 +2017,31 @@ function renderCards() {
     .join("");
 
   emptyState.hidden = filtered.length > 0;
+}
+
+function focusHighlightedCard(linkName) {
+  window.requestAnimationFrame(() => {
+    const card = cardGrid.querySelector(`[data-link-key="${encodeURIComponent(linkName)}"]`);
+    if (!card) return;
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+function searchSite(query) {
+  const match = findBestLink(query);
+  if (!match) {
+    activeHighlightName = "";
+    searchStatus.textContent = "没有找到匹配的网址入口。";
+    showToast("没有找到匹配的网址");
+    return;
+  }
+
+  activeHighlightName = match.name;
+  setActiveFilter(match.category);
+  renderCards();
+  searchStatus.textContent = `已定位：${match.name}（${categoryNames[match.category]}）`;
+  showToast(`已定位 ${match.name}`);
+  focusHighlightedCard(match.name);
 }
 
 function showToast(message) {
@@ -1778,10 +2070,8 @@ document.addEventListener("click", (event) => {
 });
 
 const galleryPhotos = [
-  { src: "assets/gallery/hero-photo.jpg", alt: "烤鸭照片 1" },
-  { src: "assets/gallery/微信图片_20260523165106_60_26.jpg", alt: "烤鸭照片 2" },
-  { src: "assets/gallery/微信图片_20260523165108_61_26.jpg", alt: "烤鸭照片 3" },
-  { src: "assets/gallery/微信图片_20260523165109_62_26.jpg", alt: "烤鸭照片 4" },
+  { src: "assets/gallery/IMG_5862.JPG", alt: "烤鸭照片 1" },
+  { src: "assets/gallery/hero-photo.jpg", alt: "烤鸭照片 2" },
 ];
 
 function closePhotoLightbox() {
@@ -1872,14 +2162,24 @@ document.addEventListener("keydown", (event) => {
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
-    filterButtons.forEach((item) => {
-      const isActive = item === button;
-      item.classList.toggle("is-active", isActive);
-      item.setAttribute("aria-selected", String(isActive));
-    });
+    activeHighlightName = "";
+    searchStatus.textContent = "";
+    setActiveFilter(button.dataset.filter);
     renderCards();
   });
+});
+
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  searchSite(searchInput.value);
+});
+
+searchInput.addEventListener("input", () => {
+  if (!searchInput.value.trim()) {
+    activeHighlightName = "";
+    searchStatus.textContent = "";
+    renderCards();
+  }
 });
 
 totalCount.textContent = officialLinks.length;
