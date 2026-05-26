@@ -811,6 +811,115 @@ h1 {
   font-size: 15px;
 }
 
+.site-preview {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 80;
+  width: min(520px, calc(100vw - 48px));
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.98);
+  animation: preview-pop 180ms ease forwards;
+}
+
+.site-preview-header {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f5f5f7;
+  color: #424245;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.site-preview-body {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.site-preview-top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.site-preview-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.site-preview-icon img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.site-preview h3 {
+  margin: 0 0 3px;
+  font-size: 20px;
+}
+
+.site-preview p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.site-preview-details {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f5f5f7;
+}
+
+.site-preview-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.site-preview-row span:first-child {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.site-preview-row span:last-child {
+  min-width: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.site-preview .open-link {
+  width: fit-content;
+  pointer-events: auto;
+}
+
+@keyframes preview-pop {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;
@@ -1887,6 +1996,9 @@ let toastTimer;
 let avatarLightbox;
 let photoLightbox;
 let activePhotoIndex = 0;
+let previewTimer;
+let previewCard;
+let sitePreview;
 
 function domainFromUrl(url) {
   return new URL(url).hostname.replace(/^www\./, "");
@@ -1988,6 +2100,8 @@ function createAiProfile(link) {
 }
 
 function renderCards() {
+  closeSitePreview();
+
   const filtered = officialLinks.filter((link) => {
     const matchesCategory = link.category === activeFilter;
     return matchesCategory;
@@ -2062,12 +2176,127 @@ async function copyToClipboard(url) {
   }
 }
 
+function closeSitePreview() {
+  window.clearTimeout(previewTimer);
+  previewTimer = null;
+  previewCard = null;
+  sitePreview?.remove();
+  sitePreview = null;
+}
+
+function openSitePreview(link) {
+  sitePreview?.remove();
+  sitePreview = document.createElement("div");
+  sitePreview.className = "site-preview";
+  sitePreview.innerHTML = `
+    <div class="site-preview-header">${link.name} · ${domainFromUrl(link.url)}</div>
+    <div class="site-preview-body">
+      <div class="site-preview-top">
+        <span class="site-preview-icon">
+          <img src="${link.iconUrl || faviconFromUrl(link.url)}" alt="">
+        </span>
+        <div>
+          <h3>${link.name}</h3>
+          <p>${domainFromUrl(link.url)}</p>
+        </div>
+      </div>
+      ${createPreviewDetails(link)}
+      <a class="open-link" href="${link.url}" target="_blank" rel="noopener noreferrer">打开官网</a>
+    </div>
+  `;
+  document.body.appendChild(sitePreview);
+}
+
+function scheduleSitePreview(card) {
+  if (previewCard === card) return;
+  closeSitePreview();
+  previewCard = card;
+  previewTimer = window.setTimeout(() => {
+    const linkName = decodeURIComponent(card.dataset.linkKey || "");
+    const link = officialLinks.find((item) => item.name === linkName);
+    if (link && previewCard === card) {
+      openSitePreview(link);
+    }
+  }, 3000);
+}
+
+function inferRuntimeInfo(link) {
+  const byCategory = {
+    browser: "Chromium / Blink",
+    remote: "客户端服务，具体内核以官网版本说明为准",
+    network: "客户端代理内核，具体版本以发布页为准",
+    "china-ai": "云端模型服务，模型版本以官网为准",
+    "global-ai": "云端模型服务，模型版本以官网为准",
+    "music-ai": "云端生成模型，模型版本以官网为准",
+    dev: "开发工具运行环境，版本以官网发布页为准",
+    "ai-dependency": "本地运行时/命令行工具，版本以发布页为准",
+    office: "办公套件/在线服务，版本以官网为准",
+    "cloud-drive": "云存储客户端/网页服务，版本以官网为准",
+  };
+
+  return link.coreVersion || byCategory[link.category] || "以官网说明为准";
+}
+
+function inferProductType(link) {
+  const byCategory = {
+    browser: "桌面/移动端浏览器",
+    remote: "远程控制客户端",
+    network: "网络工具",
+    "china-ai": "AI 在线服务",
+    "global-ai": "AI 在线服务",
+    "music-ai": "AI 音乐生成服务",
+    dev: "开发工具",
+    "ai-dependency": "AI 编程依赖",
+    office: "办公服务",
+    "cloud-drive": "云盘服务",
+  };
+
+  return link.productType || byCategory[link.category] || "官网服务";
+}
+
+function createPreviewDetails(link) {
+  const rows = [
+    ["分类", categoryNames[link.category] || link.categoryLabel],
+    ["产品形态", inferProductType(link)],
+    ["最新版本", link.latestVersion || "以官网发布页为准"],
+    ["内核/基础", inferRuntimeInfo(link)],
+    ["官网域名", domainFromUrl(link.url)],
+  ];
+
+  return `
+    <div class="site-preview-details">
+      ${rows.map(([label, value]) => `
+        <div class="site-preview-row">
+          <span>${label}</span>
+          <span>${value}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 document.addEventListener("click", (event) => {
   const copyButton = event.target.closest("[data-copy]");
   if (copyButton) {
     copyToClipboard(copyButton.dataset.copy);
   }
 });
+
+cardGrid.addEventListener("pointerover", (event) => {
+  if (event.pointerType && event.pointerType !== "mouse") return;
+  const card = event.target.closest(".link-card");
+  if (!card || !cardGrid.contains(card)) return;
+  scheduleSitePreview(card);
+});
+
+cardGrid.addEventListener("pointerout", (event) => {
+  const card = event.target.closest(".link-card");
+  if (!card || !cardGrid.contains(card)) return;
+  if (event.relatedTarget && card.contains(event.relatedTarget)) return;
+  closeSitePreview();
+});
+
+window.addEventListener("scroll", closeSitePreview, { passive: true });
 
 const galleryPhotos = [
   { src: "assets/gallery/IMG_5862.JPG", alt: "烤鸭照片 1" },
